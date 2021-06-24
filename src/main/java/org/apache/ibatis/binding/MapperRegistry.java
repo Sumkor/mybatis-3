@@ -34,7 +34,7 @@ import org.apache.ibatis.session.SqlSession;
 public class MapperRegistry {
 
   private final Configuration config;
-  private final Map<Class<?>, MapperProxyFactory<?>> knownMappers = new HashMap<>();
+  private final Map<Class<?>, MapperProxyFactory<?>> knownMappers = new HashMap<>(); // key 为 mapper 接口类，value 为 MapperProxyFactory 实例
 
   public MapperRegistry(Configuration config) {
     this.config = config;

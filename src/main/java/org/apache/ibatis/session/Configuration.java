@@ -668,17 +668,17 @@ public class Configuration {
     executorType = executorType == null ? defaultExecutorType : executorType;
     executorType = executorType == null ? ExecutorType.SIMPLE : executorType;
     Executor executor;
-    if (ExecutorType.BATCH == executorType) {
+    if (ExecutorType.BATCH == executorType) {        // 该类型的执行器会批量执行所有更新语句，如果 SELECT 在多个更新中间执行，将在必要时将多条更新语句分隔开来，以方便理解。
       executor = new BatchExecutor(this, transaction);
-    } else if (ExecutorType.REUSE == executorType) {
+    } else if (ExecutorType.REUSE == executorType) { // 该类型的执行器会复用预处理语句。
       executor = new ReuseExecutor(this, transaction);
-    } else {
+    } else {                                         // 该类型的执行器没有特别的行为。它为每个语句的执行创建一个新的预处理语句。
       executor = new SimpleExecutor(this, transaction);
     }
     if (cacheEnabled) {
       executor = new CachingExecutor(executor);
     }
-    executor = (Executor) interceptorChain.pluginAll(executor);
+    executor = (Executor) interceptorChain.pluginAll(executor); // 使用插件来包装 executor
     return executor;
   }
 

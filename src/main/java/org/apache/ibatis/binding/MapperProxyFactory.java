@@ -28,10 +28,10 @@ import org.apache.ibatis.session.SqlSession;
  */
 public class MapperProxyFactory<T> {
 
-  private final Class<T> mapperInterface;
-  private final Map<Method, MapperMethodInvoker> methodCache = new ConcurrentHashMap<>();
+  private final Class<T> mapperInterface; // DAO 层的 mapper 接口类
+  private final Map<Method, MapperMethodInvoker> methodCache = new ConcurrentHashMap<>(); // 用于存储当前 DAO 接口中所有的方法
 
-  public MapperProxyFactory(Class<T> mapperInterface) {
+  public MapperProxyFactory(Class<T> mapperInterface) { // 一个接口对应一个代理工厂
     this.mapperInterface = mapperInterface;
   }
 
@@ -45,11 +45,11 @@ public class MapperProxyFactory<T> {
 
   @SuppressWarnings("unchecked")
   protected T newInstance(MapperProxy<T> mapperProxy) {
-    return (T) Proxy.newProxyInstance(mapperInterface.getClassLoader(), new Class[] { mapperInterface }, mapperProxy);
+    return (T) Proxy.newProxyInstance(mapperInterface.getClassLoader(), new Class[] { mapperInterface }, mapperProxy); // JDK 动态代理
   }
 
   public T newInstance(SqlSession sqlSession) {
-    final MapperProxy<T> mapperProxy = new MapperProxy<>(sqlSession, mapperInterface, methodCache);
+    final MapperProxy<T> mapperProxy = new MapperProxy<>(sqlSession, mapperInterface, methodCache); // 使用 mapperProxy 作为 InvocationHandler
     return newInstance(mapperProxy);
   }
 

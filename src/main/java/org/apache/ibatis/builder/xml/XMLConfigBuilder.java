@@ -385,7 +385,7 @@ public class XMLConfigBuilder extends BaseBuilder {
             }
           } else if (resource == null && url == null && mapperClass != null) {
             Class<?> mapperInterface = Resources.classForName(mapperClass);
-            configuration.addMapper(mapperInterface);
+            configuration.addMapper(mapperInterface); // 将 mapper 接口类注册至 Configuration 对象中
           } else {
             throw new BuilderException("A mapper element may only specify a url, resource or class, but not more than one.");
           }

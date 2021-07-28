@@ -42,16 +42,16 @@ public class Plugin implements InvocationHandler {
   }
 
   public static Object wrap(Object target, Interceptor interceptor) {
-    Map<Class<?>, Set<Method>> signatureMap = getSignatureMap(interceptor);
+    Map<Class<?>, Set<Method>> signatureMap = getSignatureMap(interceptor); // 解析插件类上的 @Intercepts @Signature 注解
     Class<?> type = target.getClass();
     Class<?>[] interfaces = getAllInterfaces(type, signatureMap);
-    if (interfaces.length > 0) {
+    if (interfaces.length > 0) { // 满足条件的，说明 target 类需要经过插件 interceptor 来拦截，因此为 target 生成代理
       return Proxy.newProxyInstance(
           type.getClassLoader(),
           interfaces,
-          new Plugin(target, interceptor, signatureMap));
+          new Plugin(target, interceptor, signatureMap)); // 返回代理对象
     }
-    return target;
+    return target; // 返回原始对象
   }
 
   @Override

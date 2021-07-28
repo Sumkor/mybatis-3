@@ -58,8 +58,8 @@ public class SimpleExecutor extends BaseExecutor {
     Statement stmt = null;
     try {
       Configuration configuration = ms.getConfiguration();
-      StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler, boundSql);
-      stmt = prepareStatement(handler, ms.getStatementLog());
+      StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler, boundSql); // StatementHandler，支持插件扩展
+      stmt = prepareStatement(handler, ms.getStatementLog()); // 获取数据库连接对象 Connection，以构造 Statement 对象
       return handler.query(stmt, resultHandler);
     } finally {
       closeStatement(stmt);
@@ -83,9 +83,9 @@ public class SimpleExecutor extends BaseExecutor {
 
   private Statement prepareStatement(StatementHandler handler, Log statementLog) throws SQLException {
     Statement stmt;
-    Connection connection = getConnection(statementLog);
-    stmt = handler.prepare(connection, transaction.getTimeout());
-    handler.parameterize(stmt);
+    Connection connection = getConnection(statementLog); // 获取数据库连接对象
+    stmt = handler.prepare(connection, transaction.getTimeout()); // 使用 Connection 对象构造 Statement 对象
+    handler.parameterize(stmt); // 其中会使用 ParameterHandler 设置参数，支持插件扩展
     return stmt;
   }
 

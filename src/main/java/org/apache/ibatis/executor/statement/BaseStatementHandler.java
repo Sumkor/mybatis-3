@@ -66,8 +66,8 @@ public abstract class BaseStatementHandler implements StatementHandler {
 
     this.boundSql = boundSql;
 
-    this.parameterHandler = configuration.newParameterHandler(mappedStatement, parameterObject, boundSql);
-    this.resultSetHandler = configuration.newResultSetHandler(executor, mappedStatement, rowBounds, parameterHandler, resultHandler, boundSql);
+    this.parameterHandler = configuration.newParameterHandler(mappedStatement, parameterObject, boundSql); // 创建 ParameterHandler，支持插件扩展
+    this.resultSetHandler = configuration.newResultSetHandler(executor, mappedStatement, rowBounds, parameterHandler, resultHandler, boundSql); // 创建 ResultSetHandler，支持插件扩展
   }
 
   @Override
@@ -85,7 +85,7 @@ public abstract class BaseStatementHandler implements StatementHandler {
     ErrorContext.instance().sql(boundSql.getSql());
     Statement statement = null;
     try {
-      statement = instantiateStatement(connection);
+      statement = instantiateStatement(connection); // 使用数据库连接对象，构造 Statement 对象。 eg. java.sql.Connection#prepareStatement
       setStatementTimeout(statement, transactionTimeout);
       setFetchSize(statement);
       return statement;

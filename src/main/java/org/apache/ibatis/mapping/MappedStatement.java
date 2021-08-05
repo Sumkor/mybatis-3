@@ -31,23 +31,23 @@ import org.apache.ibatis.session.Configuration;
 /**
  * @author Clinton Begin
  */
-public final class MappedStatement {
+public final class MappedStatement {     // 该对象表示 Mapper.xml 中的一条 SQL 信息，相关标签见 org\apache\ibatis\builder\xml\mybatis-3-mapper.dtd，详细介绍见 https://mybatis.org/mybatis-3/zh/sqlmap-xml.html
 
   private String resource;
   private Configuration configuration;
   private String id;
-  private Integer fetchSize;
-  private Integer timeout;
-  private StatementType statementType;
-  private ResultSetType resultSetType;
-  private SqlSource sqlSource;
+  private Integer fetchSize;             // 这是一个给驱动的建议值，尝试让驱动程序每次批量返回的结果行数等于这个设置值。默认值为未设置（unset）（依赖驱动）。
+  private Integer timeout;               // 驱动程序等待数据库返回请求结果的秒数，超时将会抛出异常
+  private StatementType statementType;   // 参数可选值为 STATEMENT、PREPARED 或 CALLABLE，这会让 MyBatis 分别使用 Statement、PreparedStatement 或 CallableStatement 与数据库交互，默认值为 PREPARED
+  private ResultSetType resultSetType;   // 参数可选值为 FORWARD_ONLY、SCROLL_SENSITIVE 或 SCROLL_INSENSITIVE，用于设置从结果集读取数据时，读指针能否上下移动。例如，只需要顺序读取，可设置为 FORWARD_ONLY，便于释放已读内容所占的内存
+  private SqlSource sqlSource;           // sql 语句
   private Cache cache;
   private ParameterMap parameterMap;
   private List<ResultMap> resultMaps;
-  private boolean flushCacheRequired;
-  private boolean useCache;
-  private boolean resultOrdered;
-  private SqlCommandType sqlCommandType;
+  private boolean flushCacheRequired;    // 对应 xml 中的 flushCache 属性。将其设置为 true 后，只要语句被调用，都会导致本地缓存和二级缓存被清空，默认值：false。
+  private boolean useCache;              // 将其设置为 true 后，将会导致本条语句的结果被二级缓存缓存起来，默认值：对 select 元素为 true。
+  private boolean resultOrdered;         // 这个设置仅针对嵌套结果 select 语句。默认值：false。
+  private SqlCommandType sqlCommandType; // sql 语句的类型，如 select、update、delete、insert
   private KeyGenerator keyGenerator;
   private String[] keyProperties;
   private String[] keyColumns;

@@ -180,7 +180,7 @@ public class Configuration {
     this.environment = environment;
   }
 
-  public Configuration() {
+  public Configuration() { // 映射关系：mybatis-config.xml 中的内置变量与实现类
     typeAliasRegistry.registerAlias("JDBC", JdbcTransactionFactory.class);
     typeAliasRegistry.registerAlias("MANAGED", ManagedTransactionFactory.class);
 

@@ -18,7 +18,7 @@ package org.apache.ibatis.session;
 /**
  * @author Clinton Begin
  */
-public class RowBounds {
+public class RowBounds { // 该类用于实现分页查询：先把数据全部查询到 ResultSet，然后从 ResultSet 中取出 offset 和 limit 之间的数据
 
   public static final int NO_ROW_OFFSET = 0;
   public static final int NO_ROW_LIMIT = Integer.MAX_VALUE;

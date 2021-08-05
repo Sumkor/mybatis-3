@@ -114,7 +114,7 @@ public class XMLConfigBuilder extends BaseBuilder {
       reflectorFactoryElement(root.evalNode("reflectorFactory"));
       settingsElement(settings);
       // read it after objectFactory and objectWrapperFactory issue #631
-      environmentsElement(root.evalNode("environments"));
+      environmentsElement(root.evalNode("environments")); // 解析环境配置：数据源、事务管理
       databaseIdProviderElement(root.evalNode("databaseIdProvider"));
       typeHandlerElement(root.evalNode("typeHandlers"));
       mapperElement(root.evalNode("mappers")); // 解析映射文件
@@ -280,13 +280,13 @@ public class XMLConfigBuilder extends BaseBuilder {
       for (XNode child : context.getChildren()) {
         String id = child.getStringAttribute("id");
         if (isSpecifiedEnvironment(id)) {
-          TransactionFactory txFactory = transactionManagerElement(child.evalNode("transactionManager"));
-          DataSourceFactory dsFactory = dataSourceElement(child.evalNode("dataSource"));
-          DataSource dataSource = dsFactory.getDataSource();
+          TransactionFactory txFactory = transactionManagerElement(child.evalNode("transactionManager")); // 实例化事务工厂
+          DataSourceFactory dsFactory = dataSourceElement(child.evalNode("dataSource")); // 实例化数据库连接池工厂
+          DataSource dataSource = dsFactory.getDataSource(); // 从数据库连接池工厂中，获取数据源对象。一个 environment 标签只有一个数据源！
           Environment.Builder environmentBuilder = new Environment.Builder(id)
               .transactionFactory(txFactory)
               .dataSource(dataSource);
-          configuration.setEnvironment(environmentBuilder.build());
+          configuration.setEnvironment(environmentBuilder.build()); // 将事务工厂、数据源对象注册到 Configuration 对象中
           break;
         }
       }
@@ -316,7 +316,7 @@ public class XMLConfigBuilder extends BaseBuilder {
     if (context != null) {
       String type = context.getStringAttribute("type");
       Properties props = context.getChildrenAsProperties();
-      TransactionFactory factory = (TransactionFactory) resolveClass(type).getDeclaredConstructor().newInstance();
+      TransactionFactory factory = (TransactionFactory) resolveClass(type).getDeclaredConstructor().newInstance(); // 实例化事务工厂，eg. JdbcTransactionFactory
       factory.setProperties(props);
       return factory;
     }
@@ -328,7 +328,7 @@ public class XMLConfigBuilder extends BaseBuilder {
       String type = context.getStringAttribute("type");
       Properties props = context.getChildrenAsProperties();
       DataSourceFactory factory = (DataSourceFactory) resolveClass(type).getDeclaredConstructor().newInstance();
-      factory.setProperties(props);
+      factory.setProperties(props); // 将配置文件中的数据库连接信息，写入 DataSourceFactory 中的 DataSource 对象
       return factory;
     }
     throw new BuilderException("Environment declaration requires a DataSourceFactory.");

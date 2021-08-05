@@ -78,12 +78,12 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
   }
 
   @Override
-  public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+  public Object invoke(Object proxy, Method method, Object[] args) throws Throwable { // 代理方法
     try {
       if (Object.class.equals(method.getDeclaringClass())) { // 如果是 Object 中定义的方法，直接执行。如 toString()、hashCode() 等
         return method.invoke(this, args);
-      } else { // 其他方法交由 MethodInvoker 来执行
-        return cachedInvoker(method).invoke(proxy, method, args, sqlSession);
+      } else {
+        return cachedInvoker(method).invoke(proxy, method, args, sqlSession); // 其他方法交由 MethodInvoker 来执行
       }
     } catch (Throwable t) {
       throw ExceptionUtil.unwrapThrowable(t);

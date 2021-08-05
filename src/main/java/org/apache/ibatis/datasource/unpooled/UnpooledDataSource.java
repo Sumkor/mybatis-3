@@ -221,7 +221,7 @@ public class UnpooledDataSource implements DataSource {
 
   private Connection doGetConnection(Properties properties) throws SQLException {
     initializeDriver();
-    Connection connection = DriverManager.getConnection(url, properties);
+    Connection connection = DriverManager.getConnection(url, properties); // 利用数据库驱动包，创建连接对象
     configureConnection(connection);
     return connection;
   }

@@ -30,8 +30,8 @@ public class MapUtil {
    */
   public static <K, V> V computeIfAbsent(Map<K, V> map, K key, Function<K, V> mappingFunction) {
     V value = map.get(key);
-    if (value != null) {
-      return value;
+    if (value != null) { // 当 key 存在时，并发情况下 ConcurrentHashMap#computeIfAbsent 中的 synchronized 会造成阻塞，具有性能问题！
+      return value;      // 因此这里判断 key 已存在，直接返回
     }
     return map.computeIfAbsent(key, mappingFunction::apply);
   }

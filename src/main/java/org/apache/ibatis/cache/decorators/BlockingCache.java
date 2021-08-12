@@ -34,11 +34,11 @@ import org.apache.ibatis.cache.CacheException;
  * @author Eduardo Macarron
  *
  */
-public class BlockingCache implements Cache {
+public class BlockingCache implements Cache { // 若缓存中找不到对应的 key，是否会一直 blocking，直到有对应的数据进入缓存。
 
   private long timeout;
   private final Cache delegate;
-  private final ConcurrentHashMap<Object, CountDownLatch> locks;
+  private final ConcurrentHashMap<Object, CountDownLatch> locks; // key=缓存key，value=
 
   public BlockingCache(Cache delegate) {
     this.delegate = delegate;
@@ -89,11 +89,11 @@ public class BlockingCache implements Cache {
   private void acquireLock(Object key) {
     CountDownLatch newLatch = new CountDownLatch(1);
     while (true) {
-      CountDownLatch latch = locks.putIfAbsent(key, newLatch);
-      if (latch == null) {
+      CountDownLatch latch = locks.putIfAbsent(key, newLatch); // 不存在 key 则存入 value，返回旧 value
+      if (latch == null) { // ConcurrentHashMap 不允许 key 或 value 为 null。只有在 map 中首次加入 key 时，这里才会等于空
         break;
       }
-      try {
+      try { // 进入这里，说明该 key 已存在对应的 CountDownLatch 对象，需要进行等待
         if (timeout > 0) {
           boolean acquired = latch.await(timeout, TimeUnit.MILLISECONDS);
           if (!acquired) {
@@ -110,11 +110,11 @@ public class BlockingCache implements Cache {
   }
 
   private void releaseLock(Object key) {
-    CountDownLatch latch = locks.remove(key);
+    CountDownLatch latch = locks.remove(key); // 释放锁
     if (latch == null) {
       throw new IllegalStateException("Detected an attempt at releasing unacquired lock. This should never happen.");
     }
-    latch.countDown();
+    latch.countDown(); // 唤醒等待锁的线程
   }
 
   public long getTimeout() {

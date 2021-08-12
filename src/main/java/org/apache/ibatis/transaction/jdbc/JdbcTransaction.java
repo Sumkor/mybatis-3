@@ -57,7 +57,7 @@ public class JdbcTransaction implements Transaction {
 
   @Override
   public Connection getConnection() throws SQLException {
-    if (connection == null) {
+    if (connection == null) { // JdbcTransaction 对象在一次会话中是单例的！因此在同一次会话使用同一个数据库连接
       openConnection();
     }
     return connection;

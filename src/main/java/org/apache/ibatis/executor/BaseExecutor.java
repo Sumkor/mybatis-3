@@ -144,16 +144,16 @@ public abstract class BaseExecutor implements Executor {
       throw new ExecutorException("Executor was closed.");
     }
     if (queryStack == 0 && ms.isFlushCacheRequired()) {
-      clearLocalCache();
+      clearLocalCache(); // 清除一级缓存
     }
     List<E> list;
     try {
-      queryStack++;
-      list = resultHandler == null ? (List<E>) localCache.getObject(key) : null;
+      queryStack++; // 非线程安全，记录嵌套查询的深度
+      list = resultHandler == null ? (List<E>) localCache.getObject(key) : null; // 查询一级缓存
       if (list != null) {
         handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);
       } else {
-        list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql); // 向数据库发起查询
+        list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql); // 查询数据库
       }
     } finally {
       queryStack--;
@@ -164,7 +164,7 @@ public abstract class BaseExecutor implements Executor {
       }
       // issue #601
       deferredLoads.clear();
-      if (configuration.getLocalCacheScope() == LocalCacheScope.STATEMENT) {
+      if (configuration.getLocalCacheScope() == LocalCacheScope.STATEMENT) { // 本地缓存默认是 SESSION 级别的，如果是 STATEMENT 级别，则这里会清空缓存
         // issue #482
         clearLocalCache();
       }
@@ -197,7 +197,7 @@ public abstract class BaseExecutor implements Executor {
       throw new ExecutorException("Executor was closed.");
     }
     CacheKey cacheKey = new CacheKey();
-    cacheKey.update(ms.getId());
+    cacheKey.update(ms.getId()); // 每一次 update 操作，都会更新 hashcode
     cacheKey.update(rowBounds.getOffset());
     cacheKey.update(rowBounds.getLimit());
     cacheKey.update(boundSql.getSql());
@@ -260,7 +260,7 @@ public abstract class BaseExecutor implements Executor {
   }
 
   @Override
-  public void clearLocalCache() {
+  public void clearLocalCache() { // 清除全部的一级缓存
     if (!closed) {
       localCache.clear();
       localOutputParameterCache.clear();
@@ -320,13 +320,13 @@ public abstract class BaseExecutor implements Executor {
 
   private <E> List<E> queryFromDatabase(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
     List<E> list;
-    localCache.putObject(key, EXECUTION_PLACEHOLDER);
+    localCache.putObject(key, EXECUTION_PLACEHOLDER); // 缓存设置占位符
     try {
-      list = doQuery(ms, parameter, rowBounds, resultHandler, boundSql);
+      list = doQuery(ms, parameter, rowBounds, resultHandler, boundSql); // 向数据库发起查询
     } finally {
-      localCache.removeObject(key);
+      localCache.removeObject(key); // 移除缓存占位符
     }
-    localCache.putObject(key, list);
+    localCache.putObject(key, list); // 数据库查询结果，写入缓存
     if (ms.getStatementType() == StatementType.CALLABLE) {
       localOutputParameterCache.putObject(key, parameter);
     }

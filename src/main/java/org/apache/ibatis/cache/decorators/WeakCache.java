@@ -28,7 +28,7 @@ import org.apache.ibatis.cache.Cache;
  *
  * @author Clinton Begin
  */
-public class WeakCache implements Cache {
+public class WeakCache implements Cache { // 弱引用：每次 GC 时都会回收
   private final Deque<Object> hardLinksToAvoidGarbageCollection;
   private final ReferenceQueue<Object> queueOfGarbageCollectedEntries;
   private final Cache delegate;
@@ -105,7 +105,7 @@ public class WeakCache implements Cache {
     }
   }
 
-  private static class WeakEntry extends WeakReference<Object> {
+  private static class WeakEntry extends WeakReference<Object> { // 弱引用
     private final Object key;
 
     private WeakEntry(Object key, Object value, ReferenceQueue<Object> garbageCollectionQueue) {

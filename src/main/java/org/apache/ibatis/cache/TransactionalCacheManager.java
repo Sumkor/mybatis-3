@@ -24,7 +24,7 @@ import org.apache.ibatis.util.MapUtil;
 /**
  * @author Clinton Begin
  */
-public class TransactionalCacheManager {
+public class TransactionalCacheManager { // 维护二级缓存 Cache 和 TransactionalCache 的映射关系，由 TransactionalCache 管理二级缓存的操作
 
   private final Map<Cache, TransactionalCache> transactionalCaches = new HashMap<>();
 
@@ -53,7 +53,7 @@ public class TransactionalCacheManager {
   }
 
   private TransactionalCache getTransactionalCache(Cache cache) {
-    return MapUtil.computeIfAbsent(transactionalCaches, cache, TransactionalCache::new);
+    return MapUtil.computeIfAbsent(transactionalCaches, cache, TransactionalCache::new); // 根据 Cache 得到对应的 TransactionalCache，若不存在则创建
   }
 
 }

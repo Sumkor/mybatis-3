@@ -32,7 +32,7 @@ import org.apache.ibatis.io.SerialFilterChecker;
 /**
  * @author Clinton Begin
  */
-public class SerializedCache implements Cache {
+public class SerializedCache implements Cache { // 缓存配置 readOnly="false" 时，会使用 SerializedCache，也就是从缓存中读到的对象是反序列化而来的，因此是不同的对象实例。速度上会慢一些，但是更安全
 
   private final Cache delegate;
 
@@ -53,7 +53,7 @@ public class SerializedCache implements Cache {
   @Override
   public void putObject(Object key, Object object) {
     if (object == null || object instanceof Serializable) {
-      delegate.putObject(key, serialize((Serializable) object));
+      delegate.putObject(key, serialize((Serializable) object)); // 经过序列化，将 value 转为二进制
     } else {
       throw new CacheException("SharedCache failed to make a copy of a non-serializable object: " + object);
     }
@@ -62,7 +62,7 @@ public class SerializedCache implements Cache {
   @Override
   public Object getObject(Object key) {
     Object object = delegate.getObject(key);
-    return object == null ? null : deserialize((byte[]) object);
+    return object == null ? null : deserialize((byte[]) object); // 反序列化
   }
 
   @Override

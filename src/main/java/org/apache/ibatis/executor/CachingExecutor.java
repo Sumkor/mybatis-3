@@ -93,20 +93,20 @@ public class CachingExecutor implements Executor {
   public <E> List<E> query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql)
       throws SQLException {
     Cache cache = ms.getCache();
-    if (cache != null) {
-      flushCacheIfRequired(ms);
+    if (cache != null) { // 二级缓存
+      flushCacheIfRequired(ms); // 检查是否需要刷新缓存，默认 select 不会刷新，而 insert/update/delete 会刷新
       if (ms.isUseCache() && resultHandler == null) {
-        ensureNoOutParams(ms, boundSql);
+        ensureNoOutParams(ms, boundSql); // 处理存储过程
         @SuppressWarnings("unchecked")
-        List<E> list = (List<E>) tcm.getObject(cache, key);
+        List<E> list = (List<E>) tcm.getObject(cache, key); // 查询二级缓存
         if (list == null) {
-          list = delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
-          tcm.putObject(cache, key, list); // issue #578 and #116
+          list = delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql); // 查询一级缓存，若查询不到再查数据库
+          tcm.putObject(cache, key, list); // issue #578 and #116 // 存入二级缓存
         }
         return list;
       }
     }
-    return delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
+    return delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql); // 来到这里，说明没有开启二级缓存
   }
 
   @Override

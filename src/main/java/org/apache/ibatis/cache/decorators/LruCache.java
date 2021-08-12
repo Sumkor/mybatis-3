@@ -86,7 +86,7 @@ public class LruCache implements Cache {
 
   private void cycleKeyList(Object key) {
     keyMap.put(key, key);
-    if (eldestKey != null) {
+    if (eldestKey != null) { // 不为 null，说明 keyMap 中发生了删除最旧元素的操作，因此底层缓存 delegate 也需要删除最旧的元素
       delegate.removeObject(eldestKey);
       eldestKey = null;
     }

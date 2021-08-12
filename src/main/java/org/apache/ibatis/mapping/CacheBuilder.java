@@ -125,7 +125,7 @@ public class CacheBuilder {
         cache = new ScheduledCache(cache);
         ((ScheduledCache) cache).setClearInterval(clearInterval);
       }
-      if (readWrite) {
+      if (readWrite) { // readOnly="false" 时，这里为 true
         cache = new SerializedCache(cache);
       }
       cache = new LoggingCache(cache);

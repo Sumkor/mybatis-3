@@ -82,7 +82,7 @@ public class ScheduledCache implements Cache {
     return delegate.equals(obj);
   }
 
-  private boolean clearWhenStale() {
+  private boolean clearWhenStale() { // 检查：距离上一次清除，是否达到清理周期阈值
     if (System.currentTimeMillis() - lastClear > clearInterval) {
       clear();
       return true;

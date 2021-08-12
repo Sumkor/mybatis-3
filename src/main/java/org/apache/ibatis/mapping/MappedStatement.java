@@ -41,11 +41,11 @@ public final class MappedStatement {     // 该对象表示 Mapper.xml 中的一
   private StatementType statementType;   // 参数可选值为 STATEMENT、PREPARED 或 CALLABLE，这会让 MyBatis 分别使用 Statement、PreparedStatement 或 CallableStatement 与数据库交互，默认值为 PREPARED
   private ResultSetType resultSetType;   // 参数可选值为 FORWARD_ONLY、SCROLL_SENSITIVE 或 SCROLL_INSENSITIVE，用于设置从结果集读取数据时，读指针能否上下移动。例如，只需要顺序读取，可设置为 FORWARD_ONLY，便于释放已读内容所占的内存
   private SqlSource sqlSource;           // sql 语句
-  private Cache cache;
+  private Cache cache;                   // 二级缓存，若无配置则为空
   private ParameterMap parameterMap;
   private List<ResultMap> resultMaps;
   private boolean flushCacheRequired;    // 对应 xml 中的 flushCache 属性。将其设置为 true 后，只要语句被调用，都会导致本地缓存和二级缓存被清空，默认值：false。
-  private boolean useCache;              // 将其设置为 true 后，将会导致本条语句的结果被二级缓存缓存起来，默认值：对 select 元素为 true。
+  private boolean useCache;              // 对应 xml 中的 useCache 属性。将其设置为 true 后，将会导致本条语句的结果被二级缓存缓存起来，默认值：对 select 元素为 true。
   private boolean resultOrdered;         // 这个设置仅针对嵌套结果 select 语句。默认值：false。
   private SqlCommandType sqlCommandType; // sql 语句的类型，如 select、update、delete、insert
   private KeyGenerator keyGenerator;

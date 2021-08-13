@@ -34,11 +34,11 @@ import org.apache.ibatis.cache.CacheException;
  * @author Eduardo Macarron
  *
  */
-public class BlockingCache implements Cache { // 若缓存中找不到对应的 key，是否会一直 blocking，直到有对应的数据进入缓存。
+public class BlockingCache implements Cache { // 若缓存中找不到对应的 key，是否会一直 blocking，直到有对应的数据进入缓存。（不管是对 key 的写入还是访问，都是互斥的。锁的粒度是 key 级别的）
 
   private long timeout;
   private final Cache delegate;
-  private final ConcurrentHashMap<Object, CountDownLatch> locks; // key=缓存key，value=
+  private final ConcurrentHashMap<Object, CountDownLatch> locks; // key=缓存key，value=闭锁，该闭锁可以理解为是对 key 的占位。其他占不到位的线程，只能在闭锁处等待。
 
   public BlockingCache(Cache delegate) {
     this.delegate = delegate;
@@ -66,8 +66,8 @@ public class BlockingCache implements Cache { // 若缓存中找不到对应的 
 
   @Override
   public Object getObject(Object key) {
-    acquireLock(key);
-    Object value = delegate.getObject(key);
+    acquireLock(key);                       // 尝试获取锁。等待直到在 locks map 中没有其他线程设置的闭锁
+    Object value = delegate.getObject(key); // 来到这里，二级缓存中不一定有值，依此查询：二级缓存 -> 一级缓存 -> 数据库
     if (value != null) {
       releaseLock(key);
     }
@@ -86,14 +86,14 @@ public class BlockingCache implements Cache { // 若缓存中找不到对应的 
     delegate.clear();
   }
 
-  private void acquireLock(Object key) {
+  private void acquireLock(Object key) { // 获取锁。目的是当 key 在二级缓存中不存在时，进入等待。
     CountDownLatch newLatch = new CountDownLatch(1);
     while (true) {
-      CountDownLatch latch = locks.putIfAbsent(key, newLatch); // 不存在 key 则存入 value，返回旧 value
-      if (latch == null) { // ConcurrentHashMap 不允许 key 或 value 为 null。只有在 map 中首次加入 key 时，这里才会等于空
-        break;
+      CountDownLatch latch = locks.putIfAbsent(key, newLatch); // 不管 key 在二级缓存中存在与否，只要在 map 中不存在，当前线程就会在 map 中设置一个闭锁（之后当前线程会去二级缓存/数据库查询，在此期间，其他线程都会在闭锁处等待）
+      if (latch == null) {                                     // ConcurrentHashMap 不允许 key 或 value 为 null。只有在 map 中首次加入 key 时，才会使条件 latch == null 成立
+        break;                                                 // 也就是说，由 map#putIfAbsent 保证了互斥性（线程对 key 的访问是串行的！）
       }
-      try { // 进入这里，说明该 key 已存在对应的 CountDownLatch 对象，需要进行等待
+      try { // 进入这里，说明在 map 中该 key 已存在对应的 CountDownLatch 对象，需要进行等待
         if (timeout > 0) {
           boolean acquired = latch.await(timeout, TimeUnit.MILLISECONDS);
           if (!acquired) {
@@ -110,11 +110,11 @@ public class BlockingCache implements Cache { // 若缓存中找不到对应的 
   }
 
   private void releaseLock(Object key) {
-    CountDownLatch latch = locks.remove(key); // 释放锁
+    CountDownLatch latch = locks.remove(key); // 在 map 中移除闭锁。对于 acquireLock 操作来说，就是一个释放锁的操作
     if (latch == null) {
       throw new IllegalStateException("Detected an attempt at releasing unacquired lock. This should never happen.");
     }
-    latch.countDown(); // 唤醒等待锁的线程
+    latch.countDown(); // 唤醒所有在 acquireLock 中等待锁的线程
   }
 
   public long getTimeout() {

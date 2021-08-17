@@ -211,7 +211,7 @@ public class SqlRunner {
       columns.add(rsmd.getColumnLabel(i + 1));
       try {
         Class<?> type = Resources.classForName(rsmd.getColumnClassName(i + 1));
-        TypeHandler<?> typeHandler = typeHandlerRegistry.getTypeHandler(type);
+        TypeHandler<?> typeHandler = typeHandlerRegistry.getTypeHandler(type); // 根据 Java 类型获取对应的 TypeHandler。例如：Long -> LongTypeHandler
         if (typeHandler == null) {
           typeHandler = typeHandlerRegistry.getTypeHandler(Object.class);
         }
@@ -225,7 +225,7 @@ public class SqlRunner {
       for (int i = 0, n = columns.size(); i < n; i++) {
         String name = columns.get(i);
         TypeHandler<?> handler = typeHandlers.get(i);
-        row.put(name.toUpperCase(Locale.ENGLISH), handler.getResult(rs, name));
+        row.put(name.toUpperCase(Locale.ENGLISH), handler.getResult(rs, name)); // 根据 TypeHandler 获取对应的字段值。例如：ResultSet#getLong
       }
       list.add(row);
     }

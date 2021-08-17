@@ -43,7 +43,7 @@ public final class MappedStatement {     // 该对象表示 Mapper.xml 中的一
   private SqlSource sqlSource;           // sql 语句
   private Cache cache;                   // 二级缓存，若无配置则为空
   private ParameterMap parameterMap;
-  private List<ResultMap> resultMaps;
+  private List<ResultMap> resultMaps;    // 描述如何从数据库结果集中加载对象。resultType 和 resultMap 之间只能同时使用一个。
   private boolean flushCacheRequired;    // 对应 xml 中的 flushCache 属性。将其设置为 true 后，只要语句被调用，都会导致本地缓存和二级缓存被清空，默认值：false。
   private boolean useCache;              // 对应 xml 中的 useCache 属性。将其设置为 true 后，将会导致本条语句的结果被二级缓存缓存起来，默认值：对 select 元素为 true。
   private boolean resultOrdered;         // 这个设置仅针对嵌套结果 select 语句。默认值：false。
@@ -55,7 +55,7 @@ public final class MappedStatement {     // 该对象表示 Mapper.xml 中的一
   private String databaseId;
   private Log statementLog;
   private LanguageDriver lang;
-  private String[] resultSets;
+  private String[] resultSets;           // 这个设置仅适用于多结果集的情况。它将列出语句执行后返回的结果集并赋予每个结果集一个名称，多个名称之间以逗号分隔。
 
   MappedStatement() {
     // constructor disabled

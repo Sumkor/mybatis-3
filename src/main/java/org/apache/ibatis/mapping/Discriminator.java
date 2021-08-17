@@ -23,7 +23,7 @@ import org.apache.ibatis.session.Configuration;
 /**
  * @author Clinton Begin
  */
-public class Discriminator {
+public class Discriminator { // 监别器，对查询的结果进行分支处理
 
   private ResultMapping resultMapping;
   private Map<String, String> discriminatorMap;

@@ -1016,12 +1016,12 @@ public class Configuration {
       if (key.contains(".")) {
         final String shortKey = getShortName(key);
         if (super.get(shortKey) == null) {
-          super.put(shortKey, value);
+          super.put(shortKey, value); // 以短名称进行注册
         } else {
-          super.put(shortKey, (V) new Ambiguity(shortKey));
+          super.put(shortKey, (V) new Ambiguity(shortKey)); // 短名称注册出现冲突
         }
       }
-      return super.put(key, value);
+      return super.put(key, value); // 以全名称注册
     }
 
     @Override

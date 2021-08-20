@@ -408,7 +408,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
     return resultMaps;
   }
 
-  public ResultMapping buildResultMapping(
+  public ResultMapping buildResultMapping( // 解析 SQL 映射文件中的 ResultMap 标签，构造 ResultMapping 对象
       Class<?> resultType,
       String property,
       String column,
@@ -423,7 +423,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
       String resultSet,
       String foreignColumn,
       boolean lazy) {
-    Class<?> javaTypeClass = resolveResultJavaType(resultType, property, javaType);
+    Class<?> javaTypeClass = resolveResultJavaType(resultType, property, javaType); // 解析 resultType 类，获取该类的 property 属性对应的 java 类型
     TypeHandler<?> typeHandlerInstance = resolveTypeHandler(javaTypeClass, typeHandler);
     List<ResultMapping> composites;
     if ((nestedSelect == null || nestedSelect.isEmpty()) && (foreignColumn == null || foreignColumn.isEmpty())) {

@@ -325,7 +325,7 @@ public class XMLConfigBuilder extends BaseBuilder {
 
   private DataSourceFactory dataSourceElement(XNode context) throws Exception {
     if (context != null) {
-      String type = context.getStringAttribute("type");
+      String type = context.getStringAttribute("type"); // eg. "POOLED"
       Properties props = context.getChildrenAsProperties();
       DataSourceFactory factory = (DataSourceFactory) resolveClass(type).getDeclaredConstructor().newInstance();
       factory.setProperties(props); // 将配置文件中的数据库连接信息，写入 DataSourceFactory 中的 DataSource 对象

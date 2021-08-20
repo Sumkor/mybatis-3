@@ -42,7 +42,7 @@ public class PooledDataSource implements DataSource {
 
   private final PoolState state = new PoolState(this); // 存储数据库连接对象
 
-  private final UnpooledDataSource dataSource;
+  private final UnpooledDataSource dataSource;     // 用于创建数据库连接对象
 
   // OPTIONAL CONFIGURATION FIELDS                 // 配置说明见 https://mybatis.org/mybatis-3/zh/configuration.html
   protected int poolMaximumActiveConnections = 10; // 在任意时间可存在的活动（正在使用）连接数量

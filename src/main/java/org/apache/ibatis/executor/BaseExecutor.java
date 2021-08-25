@@ -55,8 +55,8 @@ public abstract class BaseExecutor implements Executor {
   protected Executor wrapper;
 
   protected ConcurrentLinkedQueue<DeferredLoad> deferredLoads;
-  protected PerpetualCache localCache;
-  protected PerpetualCache localOutputParameterCache;
+  protected PerpetualCache localCache;                // 一级缓存，保存查询结果
+  protected PerpetualCache localOutputParameterCache; // 一级缓存，保存存储过程的入参
   protected Configuration configuration;
 
   protected int queryStack;

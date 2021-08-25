@@ -92,8 +92,8 @@ public class CachingExecutor implements Executor {
   @Override
   public <E> List<E> query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql)
       throws SQLException {
-    Cache cache = ms.getCache();
-    if (cache != null) { // 二级缓存
+    Cache cache = ms.getCache(); // 从 MappedStatement 中获取 SQL 映射文件中配置的二级缓存对象，MappedStatement#cache 统一存储在 Configuration 对象之中
+    if (cache != null) { // 不为空，说明二级缓存存在
       flushCacheIfRequired(ms); // 检查是否需要刷新缓存，默认 select 不会刷新，而 insert/update/delete 会刷新
       if (ms.isUseCache() && resultHandler == null) {
         ensureNoOutParams(ms, boundSql); // 处理存储过程

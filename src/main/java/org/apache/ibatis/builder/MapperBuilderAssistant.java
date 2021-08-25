@@ -137,8 +137,8 @@ public class MapperBuilderAssistant extends BaseBuilder {
         .blocking(blocking)
         .properties(props)
         .build();
-    configuration.addCache(cache);
-    currentCache = cache;
+    configuration.addCache(cache); // 注册到 configuration 之中
+    currentCache = cache; // 记录到当前的 builder 对象中，后续用于传值给 MappedStatement
     return cache;
   }
 

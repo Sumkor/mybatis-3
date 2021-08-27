@@ -69,7 +69,7 @@ public class XMLScriptBuilder extends BaseBuilder {
     if (isDynamic) {
       sqlSource = new DynamicSqlSource(configuration, rootSqlNode);
     } else {
-      sqlSource = new RawSqlSource(configuration, rootSqlNode, parameterType);
+      sqlSource = new RawSqlSource(configuration, rootSqlNode, parameterType); // 提前调用 MixedSqlNode#apply 生成 SQL 字符串，再解析生成 ParameterMapping 对象
     }
     return sqlSource;
   }
@@ -82,11 +82,11 @@ public class XMLScriptBuilder extends BaseBuilder {
       if (child.getNode().getNodeType() == Node.CDATA_SECTION_NODE || child.getNode().getNodeType() == Node.TEXT_NODE) {
         String data = child.getStringBody("");
         TextSqlNode textSqlNode = new TextSqlNode(data);
-        if (textSqlNode.isDynamic()) {
-          contents.add(textSqlNode);
+        if (textSqlNode.isDynamic()) { // 判断是否是动态 SQL，包含 ${} 符号的就是动态的
+          contents.add(textSqlNode);   // 动态 SQL，将 TextSqlNode 加入 List<SqlNode>
           isDynamic = true;
         } else {
-          contents.add(new StaticTextSqlNode(data));
+          contents.add(new StaticTextSqlNode(data)); // 静态 SQL，将 StaticTextSqlNode 加入 List<SqlNode>
         }
       } else if (child.getNode().getNodeType() == Node.ELEMENT_NODE) { // issue #628
         String nodeName = child.getNode().getNodeName();
@@ -98,7 +98,7 @@ public class XMLScriptBuilder extends BaseBuilder {
         isDynamic = true;
       }
     }
-    return new MixedSqlNode(contents);
+    return new MixedSqlNode(contents); // 将 List<SqlNode> 封装为 MixedSqlNode 节点
   }
 
   private interface NodeHandler {

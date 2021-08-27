@@ -34,7 +34,7 @@ import org.apache.ibatis.cache.CacheException;
  * @author Eduardo Macarron
  *
  */
-public class BlockingCache implements Cache { // 若缓存中找不到对应的 key，是否会一直 blocking，直到有对应的数据进入缓存。（不管是对 key 的写入还是访问，都是互斥的。锁的粒度是 key 级别的）
+public class BlockingCache implements Cache { // 若缓存中找不到对应的 key，是否会一直 blocking，直到有对应的数据进入缓存。（对 key 的读互斥、写不互斥。锁的粒度是 key 级别的）
 
   private long timeout;
   private final Cache delegate;
@@ -67,7 +67,7 @@ public class BlockingCache implements Cache { // 若缓存中找不到对应的 
   @Override
   public Object getObject(Object key) {
     acquireLock(key);                       // 尝试获取锁。等待直到在 locks map 中没有其他线程设置的闭锁
-    Object value = delegate.getObject(key); // 来到这里，二级缓存中不一定有值，依此查询：二级缓存 -> 一级缓存 -> 数据库
+    Object value = delegate.getObject(key); // 来到这里，二级缓存中不一定有值，依次查询：二级缓存 -> 一级缓存 -> 数据库
     if (value != null) {
       releaseLock(key);
     }

@@ -40,20 +40,20 @@ public class TransactionalCacheManager { // 维护二级缓存 Cache 和 Transac
     getTransactionalCache(cache).putObject(key, value);
   }
 
-  public void commit() {
+  public void commit() { // 提交事务时，当前事务下的所有改动，都写入二级缓存
     for (TransactionalCache txCache : transactionalCaches.values()) {
       txCache.commit();
     }
   }
 
-  public void rollback() {
+  public void rollback() { // 回滚事务时，当前事务下的所有改动，都不写入二级缓存
     for (TransactionalCache txCache : transactionalCaches.values()) {
       txCache.rollback();
     }
   }
 
-  private TransactionalCache getTransactionalCache(Cache cache) {
-    return MapUtil.computeIfAbsent(transactionalCaches, cache, TransactionalCache::new); // 根据 Cache 得到对应的 TransactionalCache，若不存在则创建
+  private TransactionalCache getTransactionalCache(Cache cache) { // 根据 Cache 获取对应的 TransactionalCache，若不存在则创建
+    return MapUtil.computeIfAbsent(transactionalCaches, cache, TransactionalCache::new);
   }
 
 }

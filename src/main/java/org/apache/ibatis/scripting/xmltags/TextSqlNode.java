@@ -38,17 +38,17 @@ public class TextSqlNode implements SqlNode {
     this.injectionFilter = injectionFilter;
   }
 
-  public boolean isDynamic() {
+  public boolean isDynamic() { // 判断是否是动态 SQL
     DynamicCheckerTokenParser checker = new DynamicCheckerTokenParser();
     GenericTokenParser parser = createParser(checker);
-    parser.parse(text);
+    parser.parse(text); // 如果 text 中存在 ${} 表达式，则调用 DynamicCheckerTokenParser#handleToken 设置标识为动态 SQL
     return checker.isDynamic();
   }
 
   @Override
   public boolean apply(DynamicContext context) {
     GenericTokenParser parser = createParser(new BindingTokenParser(context, injectionFilter));
-    context.appendSql(parser.parse(text));
+    context.appendSql(parser.parse(text)); // 解析 text 中的 ${} 表达式，最终 SQL 字符串存入 context 之中
     return true;
   }
 
@@ -56,7 +56,7 @@ public class TextSqlNode implements SqlNode {
     return new GenericTokenParser("${", "}", handler);
   }
 
-  private static class BindingTokenParser implements TokenHandler {
+  private static class BindingTokenParser implements TokenHandler { // TextSqlNode.text 字符串中包含 ${} 表达式，则利用该 TokenParser 解析该表达式
 
     private DynamicContext context;
     private Pattern injectionFilter;
@@ -68,15 +68,15 @@ public class TextSqlNode implements SqlNode {
 
     @Override
     public String handleToken(String content) {
-      Object parameter = context.getBindings().get("_parameter");
+      Object parameter = context.getBindings().get("_parameter"); // 获取 SQL 查询的参数对象
       if (parameter == null) {
         context.getBindings().put("value", null);
-      } else if (SimpleTypeRegistry.isSimpleType(parameter.getClass())) {
+      } else if (SimpleTypeRegistry.isSimpleType(parameter.getClass())) { // 判断参数类似是否基础数据类型
         context.getBindings().put("value", parameter);
       }
-      Object value = OgnlCache.getValue(content, context.getBindings());
+      Object value = OgnlCache.getValue(content, context.getBindings()); // 使用 OGNL 解析表达式
       String srtValue = value == null ? "" : String.valueOf(value); // issue #274 return "" instead of "null"
-      checkInjection(srtValue);
+      checkInjection(srtValue); // 对 ${} 表达式的内容进行校验，可惜没有开放出来
       return srtValue;
     }
 
@@ -87,7 +87,7 @@ public class TextSqlNode implements SqlNode {
     }
   }
 
-  private static class DynamicCheckerTokenParser implements TokenHandler {
+  private static class DynamicCheckerTokenParser implements TokenHandler { // TextSqlNode.text 字符串中包含 ${} 表达式，则利用该 TokenParser 标识为动态 SQL
 
     private boolean isDynamic;
 

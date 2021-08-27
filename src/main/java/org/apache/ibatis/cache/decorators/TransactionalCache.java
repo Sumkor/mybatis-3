@@ -35,14 +35,14 @@ import org.apache.ibatis.logging.LogFactory;
  * @author Clinton Begin
  * @author Eduardo Macarron
  */
-public class TransactionalCache implements Cache { // 作用是如果事务提交，对二级缓存的操作才会生效。如果事务回滚或者不提交事务，则不对二级缓存产生影响。（可提交读）
+public class TransactionalCache implements Cache { // 对二级缓存的静态代理，作用是（可提交读）：如果事务提交，对二级缓存的操作才会生效；如果事务回滚或者不提交，则不对二级缓存产生影响。
 
   private static final Log log = LogFactory.getLog(TransactionalCache.class);
 
-  private final Cache delegate; // 二级缓存对象
-  private boolean clearOnCommit;
+  private final Cache delegate;  // 二级缓存对象
+  private boolean clearOnCommit; // 提交事务之前，是否清空二级缓存的标识。一般在 insert/update/delete 等要求 flushCache 的操作都会要求清空缓存，但是这里不会立即清空，只是设置标志位，等到事务提交的时候再清空缓存
   private final Map<Object, Object> entriesToAddOnCommit; // 未提交缓存，用于暂存未提交的新元素。在事务提交时，再将该集合所有元素存入二级缓存
-  private final Set<Object> entriesMissedInCache; // 未命中缓存，用于防止缓存击穿
+  private final Set<Object> entriesMissedInCache;         // 未命中缓存，用于防止缓存击穿
 
   public TransactionalCache(Cache delegate) {
     this.delegate = delegate;
@@ -69,8 +69,8 @@ public class TransactionalCache implements Cache { // 作用是如果事务提�
       entriesMissedInCache.add(key); // 从一级缓存或数据库查询不到，则加入未命中缓存，防止缓存击穿
     }
     // issue #146
-    if (clearOnCommit) { // insert/update/delete 操作时默认为 true，会清空二级缓存。因此这里从二级缓存查到了，也置为空，强制从数据库查询，见 CachingExecutor#query
-      return null;
+    if (clearOnCommit) { // 这里为 true 说明当前事务中调用过 TransactionalCache#clear，已声明了对二级缓存进行清空，因此二级缓存中的数据是无效的了
+      return null;       // 这里返回 null，强制从数据库查询，见 CachingExecutor#query
     } else {
       return object;
     }
@@ -93,7 +93,7 @@ public class TransactionalCache implements Cache { // 作用是如果事务提�
   }
 
   public void commit() {
-    if (clearOnCommit) { // insert/update/delete 操作时默认为 true，因此会清空二级缓存
+    if (clearOnCommit) { // flushCache 操作会设置 clearOnCommit 为 true，说明需要在提交事务之前，清空二级缓存
       delegate.clear();
     }
     flushPendingEntries(); // 将【未提交缓存】中的数据写入【二级缓存】
@@ -105,14 +105,14 @@ public class TransactionalCache implements Cache { // 作用是如果事务提�
     reset();
   }
 
-  private void reset() { // 重置 TransactionalCache 为初始状态，便于下一次缓存操作
+  private void reset() { // 重置 TransactionalCache 为初始状态，便于下一次事务操作
     clearOnCommit = false;
     entriesToAddOnCommit.clear();
     entriesMissedInCache.clear();
   }
 
   private void flushPendingEntries() {
-    for (Map.Entry<Object, Object> entry : entriesToAddOnCommit.entrySet()) { // 将暂存在【未提交缓存】中的元素，全部提交到【二级缓存】
+    for (Map.Entry<Object, Object> entry : entriesToAddOnCommit.entrySet()) { // 将暂存在【未提交缓存】中的元素，全部写入【二级缓存】
       delegate.putObject(entry.getKey(), entry.getValue());
     }
     for (Object entry : entriesMissedInCache) {

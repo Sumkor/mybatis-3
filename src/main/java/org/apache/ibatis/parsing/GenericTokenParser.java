@@ -25,8 +25,8 @@ public class GenericTokenParser {
   private final TokenHandler handler;
 
   public GenericTokenParser(String openToken, String closeToken, TokenHandler handler) {
-    this.openToken = openToken;
-    this.closeToken = closeToken;
+    this.openToken = openToken;   // 起始标识
+    this.closeToken = closeToken; // 结束标识
     this.handler = handler;
   }
 
@@ -74,7 +74,7 @@ public class GenericTokenParser {
           builder.append(src, start, src.length - start);
           offset = src.length;
         } else {
-          builder.append(handler.handleToken(expression.toString()));
+          builder.append(handler.handleToken(expression.toString())); // 例如：利用 ParameterMappingTokenHandler#handleToken 解析 #{} 符号表达式；利用 TextSqlNode.BindingTokenParser#handleToken 解析 ${} 表达式
           offset = end + closeToken.length();
         }
       }

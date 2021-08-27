@@ -40,7 +40,7 @@ public final class MappedStatement {     // 该对象表示 Mapper.xml 中的一
   private Integer timeout;               // 驱动程序等待数据库返回请求结果的秒数，超时将会抛出异常
   private StatementType statementType;   // 参数可选值为 STATEMENT、PREPARED 或 CALLABLE，这会让 MyBatis 分别使用 Statement、PreparedStatement 或 CallableStatement 与数据库交互，默认值为 PREPARED
   private ResultSetType resultSetType;   // 参数可选值为 FORWARD_ONLY、SCROLL_SENSITIVE 或 SCROLL_INSENSITIVE，用于设置从结果集读取数据时，读指针能否上下移动。例如，只需要顺序读取，可设置为 FORWARD_ONLY，便于释放已读内容所占的内存
-  private SqlSource sqlSource;           // sql 语句
+  private SqlSource sqlSource;           // 包含 sql 语句或动态节点信息
   private Cache cache;                   // 二级缓存，若无配置则为空
   private ParameterMap parameterMap;
   private List<ResultMap> resultMaps;    // 描述如何从数据库结果集中加载对象。resultType 和 resultMap 之间只能同时使用一个。

@@ -42,12 +42,12 @@ public class SqlSourceBuilder extends BaseBuilder {
 
   public SqlSource parse(String originalSql, Class<?> parameterType, Map<String, Object> additionalParameters) {
     ParameterMappingTokenHandler handler = new ParameterMappingTokenHandler(configuration, parameterType, additionalParameters);
-    GenericTokenParser parser = new GenericTokenParser("#{", "}", handler);
+    GenericTokenParser parser = new GenericTokenParser("#{", "}", handler); // 解析 SQL 字符串中的 #{} 符号
     String sql;
     if (configuration.isShrinkWhitespacesInSql()) {
       sql = parser.parse(removeExtraWhitespaces(originalSql));
     } else {
-      sql = parser.parse(originalSql);
+      sql = parser.parse(originalSql); // 将 #{} 符号表达式解析为 ParameterMapping 对象，并将 #{} 符号表达式替换为 "?" 字符串
     }
     return new StaticSqlSource(configuration, sql, handler.getParameterMappings());
   }

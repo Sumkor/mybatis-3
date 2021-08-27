@@ -43,12 +43,12 @@ public class RawSqlSource implements SqlSource {
   public RawSqlSource(Configuration configuration, String sql, Class<?> parameterType) {
     SqlSourceBuilder sqlSourceParser = new SqlSourceBuilder(configuration);
     Class<?> clazz = parameterType == null ? Object.class : parameterType;
-    sqlSource = sqlSourceParser.parse(sql, clazz, new HashMap<>());
+    sqlSource = sqlSourceParser.parse(sql, clazz, new HashMap<>()); // 解析 SQL 字符串中的 #{} 符号
   }
 
   private static String getSql(Configuration configuration, SqlNode rootSqlNode) {
     DynamicContext context = new DynamicContext(configuration, null);
-    rootSqlNode.apply(context);
+    rootSqlNode.apply(context); // 调用 SqlNode#apply 方法构造 context#sql 属性值
     return context.getSql();
   }
 

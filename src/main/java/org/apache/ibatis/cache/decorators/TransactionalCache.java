@@ -66,7 +66,7 @@ public class TransactionalCache implements Cache { // 对二级缓存的静态�
     // issue #116
     Object object = delegate.getObject(key);
     if (object == null) {
-      entriesMissedInCache.add(key); // 从一级缓存或数据库查询不到，则加入未命中缓存，防止缓存击穿
+      entriesMissedInCache.add(key); // 从二级缓存查询不到，则加入未命中缓存，防止缓存击穿
     }
     // issue #146
     if (clearOnCommit) { // 这里为 true 说明当前事务中调用过 TransactionalCache#clear，已声明了对二级缓存进行清空，因此二级缓存中的数据是无效的了

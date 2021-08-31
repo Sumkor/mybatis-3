@@ -56,7 +56,7 @@ public class TextSqlNode implements SqlNode {
     return new GenericTokenParser("${", "}", handler);
   }
 
-  private static class BindingTokenParser implements TokenHandler { // TextSqlNode.text 字符串中包含 ${} 表达式，则利用该 TokenParser 解析该表达式
+  private static class BindingTokenParser implements TokenHandler { // TextSqlNode.text 字符串中包含 ${} 表达式，则利用该 TokenHandler 解析该表达式
 
     private DynamicContext context;
     private Pattern injectionFilter;
@@ -87,7 +87,7 @@ public class TextSqlNode implements SqlNode {
     }
   }
 
-  private static class DynamicCheckerTokenParser implements TokenHandler { // TextSqlNode.text 字符串中包含 ${} 表达式，则利用该 TokenParser 标识为动态 SQL
+  private static class DynamicCheckerTokenParser implements TokenHandler { // TextSqlNode.text 字符串中包含 ${} 表达式，则利用该 TokenHandler 标识为动态 SQL
 
     private boolean isDynamic;
 

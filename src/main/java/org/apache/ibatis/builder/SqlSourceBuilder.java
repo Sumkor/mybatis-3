@@ -66,7 +66,7 @@ public class SqlSourceBuilder extends BaseBuilder {
     return builder.toString();
   }
 
-  private static class ParameterMappingTokenHandler extends BaseBuilder implements TokenHandler {
+  private static class ParameterMappingTokenHandler extends BaseBuilder implements TokenHandler { // SQL 字符串中包含 #{} 表达式，则利用该 TokenHandler 解析该表达式
 
     private List<ParameterMapping> parameterMappings = new ArrayList<>();
     private Class<?> parameterType;
@@ -88,7 +88,7 @@ public class SqlSourceBuilder extends BaseBuilder {
       return "?";
     }
 
-    private ParameterMapping buildParameterMapping(String content) {
+    private ParameterMapping buildParameterMapping(String content) { // 解析 #{} 表达式
       Map<String, String> propertiesMap = parseParameterMapping(content);
       String property = propertiesMap.get("property");
       Class<?> propertyType;

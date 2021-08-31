@@ -94,7 +94,7 @@ public class XMLScriptBuilder extends BaseBuilder {
         if (handler == null) {
           throw new BuilderException("Unknown element <" + nodeName + "> in SQL statement.");
         }
-        handler.handleNode(child, contents);
+        handler.handleNode(child, contents); // for、if、where 等分支节点
         isDynamic = true;
       }
     }
